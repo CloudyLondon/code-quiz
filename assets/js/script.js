@@ -60,7 +60,7 @@ var questions = [
         1: "html",
       },
       {
-        2: "<!DOCTYPE html",
+        2: "<!DOCTYPE html>",
       },
       {
         3: "<html>",
@@ -78,7 +78,7 @@ var questionNumber = 0;
 
 var timerEl = document.querySelector("#timer");
 
-var timeCount = 5 * questions.length;
+var timerCount = 5 * questions.length;
 
 var countdown = undefined;
 
@@ -87,12 +87,12 @@ var startQuiz = function (event) {
   timerEl.innerHTML = timerCount;
   countdown = setInterval(() => {
     timerCount--;
-    timerEl.innerHTML = timeCount;
+    timerEl.innerHTML = timerCount;
     if (timerCount === 0) {
       clearInterval(countdown);
       var timesUpMessage = document.createElement("div");
       timesUpMessage.className = "warning message";
-      timesUpMessage.innerHTML = "Time is up!";
+      timesUpMessage.innerHTML = "Time's Up!";
       main.appendChild(timesUpMessage);
 
       setTimeout(completeQuiz, 3000);
@@ -105,7 +105,7 @@ var startQuiz = function (event) {
 var generateQuestion = function (questionDataObj) {
   main.innerHTML = "";
   var questionEl = document.createElement("div");
-  questionEl.setAttribute("data-question-id", questionDataObj.question);
+  questionEl.setAttribute("data-question-id", questionDataObj.questionId);
   questionEl.addEventListener("click", checkAnswer);
   main.appendChild(questionEl);
 
@@ -133,29 +133,141 @@ var generateQuestion = function (questionDataObj) {
 };
 
 var checkAnswer = function (event) {
-    if (event.target.dataset.answerId === undefined) {
-      return false;
+  if (event.target.dataset.answerId === undefined) {
+    return false;
+  }
+  if (document.querySelector(".message")) {
+    return false;
+  }
+  for (var i = 0; i < questions.length; i++) {
+    if (questions[i].questionId === parseInt(event.target.dataset.questionId)) {
+      var correctAnswer = questions[i].correctAnswer;
     }
-    if (document.querySelector(".message")) {
-      return false;
-    }
-    for (var i = 0; i < questions.length; i++) {
-      if (questions[i].questionId === parseInt(event.target.dataset.questionId)) {
-        var correctAnswer = questions[i].correctAnswer;
-      }
-    }
-    var feedback = document.createElement("div");
-  
-    if (parseInt(event.target.dataset.answerId) === correctAnswer) {
-      score++;
-      questionNumber++;
-      feedback.className = "success message";
-      feedback.innerHTML = "Correct!";
+  }
+  var feedback = document.createElement("div");
+
+  if (parseInt(event.target.dataset.answerId) === correctAnswer) {
+    score++;
+    questionNumber++;
+    feedback.className = "success message";
+    feedback.innerHTML = "Correct!";
+  } else {
+    questionNumber++;
+    feedback.className = "warning message";
+    feedback.innerHTML = "Wrong!";
+  }
+
+  main.appendChild(feedback);
+  setTimeout(() => {
+    if (questionNumber === questions.length) {
+      completeQuiz();
     } else {
-      questionNumber++;
-      feedback.className = "warning message";
-      feedback.innerHTML = "Wrong!";
+      generateQuestion(questions[questionNumber]);
     }
+  }, 2000);
+  timerCount += 2;
+};
+
+var completeQuiz = function () {
+  timerEl.innerHTML = "";
+  clearInterval(countdown);
+  main.innerHTML = `<h1>Quiz Complete!</h1><h2>Your Score: ${score}</h2>`;
+
+  highScoreSubmitFormEl = document.createElement("form");
+  main.appendChild(highScoreSubmitFormEl);
+
+  initialsLabelEl = document.createElement("label");
+  initialsLabelEl.htmlFor = "initials";
+  initialsLabelEl.innerText = "Your Initials: ";
+
+  initialsTextboxEl = document.createElement("input");
+  initialsTextboxEl.type = "text";
+  initialsTextboxEl.id = "initials";
+  initialsTextboxEl.required = true;
+
+  highScoreSubmitButtonEl = document.createElement("button");
+  highScoreSubmitButtonEl.type = "submit";
+  highScoreSubmitButtonEl.innerHTML = "Submit";
+  highScoreSubmitButtonEl.className = "btn";
+  highScoreSubmitButtonEl.addEventListener("click", submitHighScore);
+
+  highScoreSubmitFormEl.appendChild(initialsLabelEl);
+  highScoreSubmitFormEl.appendChild(initialsTextboxEl);
+  highScoreSubmitFormEl.appendChild(highScoreSubmitButtonEl);
+};
+
+var submitHighScore = function (event) {
+  event.preventDefault();
+  var playerInitials = document.querySelector("#initials").value;
+  if (!playerInitials) {
+    if (!document.querySelector(".warning")) {
+      var warningMessage = document.createElement("div");
+      warningMessage.className = "warning message";
+      warningMessage.innerHTML =
+        "You must enter at least one character for initials.";
+      main.appendChild(warningMessage);
+      setTimeout(() => {
+        main.removeChild(warningMessage);
+      }, 8000);
+    }
+    return false;
+  }
+  var highScoreObj = {
+    playerInitials: playerInitials,
+    score: score,
+  };
+
+  var highScores = JSON.parse(localStorage.getItem("highScores"));
+  if (!highScores) {
+    highScores = [];
+  }
+  highScores.push(highScoreObj);
+  localStorage.setItem("highScores", JSON.stringify(highScores));
+
+  location.reload(".");
+};
+
+var viewHighScores = function (event) {
+  document.querySelector("header").innerHTML = "";
+  var goHome = document.createElement("div");
+  goHome.className = "link";
+  goHome.innerHTML = "Return to Home";
+  goHome.addEventListener("click", () => location.reload("."));
+  document.querySelector("header").appendChild(goHome);
+
+  main.innerHTML = "";
+
+  var highScores = JSON.parse(localStorage.getItem("highScores"));
+  if (!highScores) {
+    main.innerHTML = "<h2>Looks like nobody has played yet.</h2>";
+  } else {
+    scoresTableEl = document.createElement("table");
+    main.appendChild(scoresTableEl);
+    trHeaderEl = document.createElement("tr");
+    scoresTableEl.appendChild(trHeaderEl);
+
+    thIntiailsEl = document.createElement("th");
+    thIntiailsEl.innerHTML = "Initials";
+    trHeaderEl.appendChild(thIntiailsEl);
+
+    thScoreEl = document.createElement("th");
+    thScoreEl.innerHTML = "Score";
+    trHeaderEl.appendChild(thScoreEl);
+
+    for (var i = 0; i < highScores.length; i++) {
+      trEl = document.createElement("tr");
+      scoresTableEl.appendChild(trEl);
+
+      tdInitialsEl = document.createElement("td");
+      tdInitialsEl.innerHTML = highScores[i].playerInitials;
+      trEl.appendChild(tdInitialsEl);
+
+      tdScoreEl = document.createElement("td");
+      tdScoreEl.innerHTML = highScores[i].score;
+      trEl.appendChild(tdScoreEl);
+    }
+  }
+};
 
 document.querySelector("#start-quiz-btn").addEventListener("click", startQuiz);
 document

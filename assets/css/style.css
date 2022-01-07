@@ -1,0 +1,134 @@
+Skip to content
+jdpasternak
+/
+coding-quiz
+Public
+Code
+Issues
+3
+Pull requests
+Actions
+More
+coding-quiz/assets/css/styles.css
+@jdpasternak
+jdpasternak Make minor style adjustments
+ 1 contributor
+105 lines (88 sloc)  2.7 KB
+﻿* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Roboto, Arial, sans-serif;
+  background-color: #a9cef4;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.link {
+  text-decoration: none;
+  color: #7ea0b7;
+}
+.link:hover {
+  color: #36494e;
+  cursor: pointer;
+}
+
+main {
+  text-align: center;
+  align-items: center;
+}
+
+.btn {
+  border: none;
+  background-color: #36494e;
+  color: #fff;
+  font-size: 20px;
+  border-radius: 4px;
+  padding: 5px 20px;
+}
+
+.btn:hover {
+  background-color: #597081;
+}
+
+.choices-list {
+  padding: 0;
+}
+
+.code {
+  font-family: monospace;
+  background-color: #36494e;
+  color: #fff;
+  border-radius: 4px;
+  padding: 4px;
+  display: inline-block;
+}
+
+.choice {
+  cursor: pointer;
+  color: #fff;
+  background-color: #36494e;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 4px;
+  list-style-type: none;
+}
+
+.choice:hover {
+  background-color: #597081;
+}
+
+form > * {
+  margin: 4px;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.message {
+  font-style: italic;
+  font-size: 14px;
+  animation-name: fadeOut;
+  animation-duration: 3s;
+  animation-delay: 5s;
+  animation-fill-mode: both;
+}
+
+.warning {
+  color: red;
+}
+
+.success {
+  color: green;
+}
+
+table {
+  margin: 0 auto;
+}
+
+th {
+  padding: 0 10px;
+}
+© 2022 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Loading complete
