@@ -132,6 +132,31 @@ var generateQuestion = function (questionDataObj) {
   }
 };
 
+var checkAnswer = function (event) {
+    if (event.target.dataset.answerId === undefined) {
+      return false;
+    }
+    if (document.querySelector(".message")) {
+      return false;
+    }
+    for (var i = 0; i < questions.length; i++) {
+      if (questions[i].questionId === parseInt(event.target.dataset.questionId)) {
+        var correctAnswer = questions[i].correctAnswer;
+      }
+    }
+    var feedback = document.createElement("div");
+  
+    if (parseInt(event.target.dataset.answerId) === correctAnswer) {
+      score++;
+      questionNumber++;
+      feedback.className = "success message";
+      feedback.innerHTML = "Correct!";
+    } else {
+      questionNumber++;
+      feedback.className = "warning message";
+      feedback.innerHTML = "Wrong!";
+    }
+
 document.querySelector("#start-quiz-btn").addEventListener("click", startQuiz);
 document
   .querySelector("#view-high-scores")
